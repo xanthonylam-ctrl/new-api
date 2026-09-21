@@ -80,7 +80,7 @@ func RequestPQAPIPay(c *gin.Context) {
 		common.ApiErrorMsg(c, "拉起支付失败")
 		return
 	}
-	if checkout == nil || checkout.PaymentOrderNo == "" || checkout.CheckoutURL == "" || checkout.Amount != amountCents || !strings.EqualFold(checkout.Currency, "CNY") {
+	if checkout == nil || checkout.PaymentOrderNo == "" || !pqapiCheckoutURLAllowed(client.baseURL, checkout.CheckoutURL) || checkout.Amount != amountCents || !strings.EqualFold(checkout.Currency, "CNY") {
 		_ = model.UpdatePendingTopUpStatus(tradeNo, model.PaymentProviderPQAPI, common.TopUpStatusFailed)
 		common.ApiErrorMsg(c, "支付服务返回的订单无效")
 		return

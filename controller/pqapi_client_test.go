@@ -9,3 +9,14 @@ func TestPQAPIHMAC(t *testing.T) {
 		t.Fatalf("unexpected signature: got %s want %s", got, want)
 	}
 }
+
+func TestPQAPICheckoutURLAllowed(t *testing.T) {
+	if !pqapiCheckoutURLAllowed("https://shop.pqapi.shop", "https://shop.pqapi.shop/pay/token") {
+		t.Fatal("expected same-origin HTTPS checkout to be accepted")
+	}
+	for _, candidate := range []string{"javascript:alert(1)", "http://shop.pqapi.shop/pay/token", "https://evil.example/pay/token"} {
+		if pqapiCheckoutURLAllowed("https://shop.pqapi.shop", candidate) {
+			t.Fatalf("expected %q to be rejected", candidate)
+		}
+	}
+}

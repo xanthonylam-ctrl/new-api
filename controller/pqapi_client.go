@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -103,4 +104,11 @@ func pqapiHMAC(secret, message string) string {
 	mac := hmac.New(sha256.New, []byte(secret))
 	_, _ = mac.Write([]byte(message))
 	return hex.EncodeToString(mac.Sum(nil))
+}
+
+func pqapiCheckoutURLAllowed(baseURL, checkoutURL string) bool {
+	base, baseErr := url.Parse(strings.TrimSpace(baseURL))
+	checkout, checkoutErr := url.Parse(strings.TrimSpace(checkoutURL))
+	return baseErr == nil && checkoutErr == nil && checkout.Scheme == "https" &&
+		strings.EqualFold(base.Hostname(), checkout.Hostname()) && checkout.User == nil
 }
